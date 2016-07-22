@@ -1,5 +1,7 @@
 module Implementation
 
+using Compat
+
 import Base: isvatuple
 
 check(T) = (T===Tuple || T===NTuple) && throw(ArgumentError("parameters of $T are undefined"))
@@ -8,7 +10,7 @@ check(T) = (T===Tuple || T===NTuple) && throw(ArgumentError("parameters of $T ar
 const N=4
 ie = :()
 for p=0:N
-    params = ntuple(i->symbol(:P,i), p)
+    params = ntuple(i->Symbol(:P,i), p)
     global tgetindex, tlength, concatenate
 
     # Accessing by a constant value
@@ -24,16 +26,16 @@ for p=0:N
         ie = :(ifelse(i == $p, $(params[p]), $ie))
     end
     @eval tgetindex{$(params...)}(t::Type{Tuple{$(params...)}}, i::Int) = (1 <= i <= $p || throw(BoundsError(t, i)); $ie)
-    # It'd be nice to simply define the constant `i` computation in the type 
+    # It'd be nice to simply define the constant `i` computation in the type
     # domain instead of relying upon dispatch, but it's not constant-folding:
     # @eval getparam{$(params...), i}(t::Type{Tuple{$(params...)}}, ::Type{Val{i}}) = (1 <= i <= $p || throw(BoundsError(t, i)); $ie)
 
     # concatenation
     for q=0:N
-        qarams = ntuple(i->symbol(:Q,i), q)
+        qarams = ntuple(i->Symbol(:Q,i), q)
         @eval concatenate{$(params...), $(qarams...)}(::Type{Tuple{$(params...)}},::Type{Tuple{$(qarams...)}}) = Tuple{$(params...), $(qarams...)}
     end
-    
+
     # length
     @eval tlength{$(params...)}(t::Type{Tuple{$(params...)}}) = $p
 end
@@ -62,16 +64,16 @@ function tgetindex(T::Type, i::Integer)
     end
 end
 
-tgetindex{I<:Integer}(T::Type, is::AbstractVector{I}) = Base.svec([tgetindex(T,i) for i in is]...)
+tgetindex{I<:Integer}(T::Type, is::AbstractVector{I}) = Core.svec([tgetindex(T,i) for i in is]...)
 
 function concatenate{T<:Tuple, S<:Tuple}(::Type{T}, ::Type{S})
-    check(T); check(S); 
+    check(T); check(S);
     isvatuple(T) && throw(ArgumentError("cannot concatenate the varargs tuple $T with $S"))
     Tuple{T.parameters..., S.parameters...}
 end
 
 ## Allow constructing Tuples like tuples with NTuple (akin to ntuple)
-Base.call(::Type{NTuple}, f, n::Integer) = Tuple{ntuple(f, n)...}
+@compat (::Type{NTuple}){F}(f::F, n::Integer) = Tuple{ntuple(f, n)...}
 
 
 end # module
