@@ -1,5 +1,6 @@
 using Tuples
 using Base.Test
+using Compat: String
 
 ## Tuples.collect
 
@@ -18,7 +19,7 @@ using Base.Test
 @test Tuples.getindex(Tuple{1,2,3}, Val{1}) === 1
 @test Tuples.getindex(Tuple{1,2,3}, Val{2}) === 2
 @test Tuples.getindex(Tuple{1,2,3}, Val{3}) === 3
-@test Tuples.getindex(Tuple{1,2,3}, 2:3) === Base.svec(2,3)
+@test Tuples.getindex(Tuple{1,2,3}, 2:3) === Core.svec(2,3)
 @test_throws BoundsError Tuples.getindex(Tuple{1,2,3}, 0)
 @test_throws BoundsError Tuples.getindex(Tuple{1,2,3}, 4)
 @test_throws BoundsError Tuples.getindex(Tuple{1,2,3}, Val{0})
@@ -27,7 +28,7 @@ using Base.Test
 @test Tuples.getindex(Tuple{Int, String}, 2) === String
 @test Tuples.getindex(Tuple{Int, String}, Val{1}) === Int
 @test Tuples.getindex(Tuple{Int, String}, Val{2}) === String
-@test Tuples.getindex(Tuple{Int, String}, [2,1]) === Base.svec(String,Int)
+@test Tuples.getindex(Tuple{Int, String}, [2,1]) === Core.svec(String,Int)
 @test_throws BoundsError Tuples.getindex(Tuple{Int, String}, 0)
 @test_throws BoundsError Tuples.getindex(Tuple{Int, String}, 3)
 @test_throws BoundsError Tuples.getindex(Tuple{Int, String}, Val{0})
@@ -37,7 +38,7 @@ using Base.Test
 @test Tuples.getindex(Tuple{Vararg{Int}}, Val{1}) === Int
 @test Tuples.getindex(Tuple{Vararg{Int}}, Val{1000}) === Int
 @test Tuples.getindex(Tuple{Vararg{Int}}, Val{10^10}) === Int
-@test Tuples.getindex(Tuple{Vararg{Int}}, [10^10, 10^10+1]) === Base.svec(Int,Int)
+@test Tuples.getindex(Tuple{Vararg{Int}}, [10^10, 10^10+1]) === Core.svec(Int,Int)
 @test_throws BoundsError Tuples.getindex(Tuple{Vararg{Int}}, 0)
 @test_throws BoundsError Tuples.getindex(Tuple{Vararg{Int}}, Val{0})
 @test Tuples.getindex(Tuple{Int, Vararg{String}}, 1) === Int
@@ -46,7 +47,7 @@ using Base.Test
 @test Tuples.getindex(Tuple{Int, Vararg{String}}, Val{1}) === Int
 @test Tuples.getindex(Tuple{Int, Vararg{String}}, Val{2}) === String
 @test Tuples.getindex(Tuple{Int, Vararg{String}}, Val{3}) === String
-@test Tuples.getindex(Tuple{Int, Vararg{String}}, [1,3]) === Base.svec(Int,String)
+@test Tuples.getindex(Tuple{Int, Vararg{String}}, [1,3]) === Core.svec(Int,String)
 @test_throws BoundsError Tuples.getindex(Tuple{Int, Vararg{String}}, 0)
 @test_throws BoundsError Tuples.getindex(Tuple{Int, Vararg{String}}, Val{0})
 
